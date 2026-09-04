@@ -51,7 +51,10 @@ jobs:
           gh --version
 
       - name: 安装依赖
-        run: npm run install
+        # 登录与签到只需运行时依赖；跳过 TypeScript/pkg 等开发工具，
+        # 避免 GitHub Runner 在 npm ci 阶段长时间卡住。
+        run: npm ci --prefix api --omit=dev --prefer-offline --no-audit --no-fund
+        timeout-minutes: 5
 
       - name: 生成二维码图片与HTML登录页
         id: gen
