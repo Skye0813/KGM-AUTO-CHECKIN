@@ -287,6 +287,13 @@ async function waitMode() {
 
     const resultLines = results.map(r => `- 账号 ${r.index}/${number}：${r.status}`).join('\n')
     appendSummary(`### 扫码结果\n\n${resultLines}`)
+
+    // 超时或过期时必须让 Actions 失败，否则会出现“任务绿了但
+    // USERINFO 没有写入”的假成功状态。
+    const failedResults = results.filter(r => !r.status.includes('登录成功'))
+    if (failedResults.length > 0) {
+      throw new Error(`${failedResults.length} 个账号未完成扫码登录`)
+    }
   } finally {
     close_api(api)
   }
